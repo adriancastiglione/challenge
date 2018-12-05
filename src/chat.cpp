@@ -47,6 +47,31 @@ void post_createUser_handler( const shared_ptr< Session > session )
     } );
 }
 
+void post_sendMessage_handler( const shared_ptr< Session > session){
+
+    const auto request = session->get_request( );
+
+    int content_length = request->get_header( "Content-Length", 0 );
+
+    session->fetch( content_length, [ ]( const shared_ptr< Session > session, const Bytes & body )
+    {
+        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
+
+        string content(body.begin(), body.end());
+        json json_content = json::parse(content);
+        json response;
+
+        if(json_content["content"]["type"] == "string"){
+            persistor->send_text_message(json_content["sender"], json_content["recipient"], json_content["content"]["text"]);
+        }
+
+
+
+        response["id"] = persistor->create_user(json_content["username"], json_content["password"]);
+        auto json_str = response.dump();
+        session->close( OK, json_str, { { "Content-Length", to_string(json_str.size()) } } );
+    } );
+}
 
 int main( const int, const char** )
 {

@@ -6,6 +6,7 @@
 #include <sqlite3.h>
 #include <exception>
 #include <vector>
+#include "Message.h"
 
 class Sqlite3Persistor{
 
@@ -27,9 +28,9 @@ public:
 
 	void save_token(int64_t token);
 	bool token_exists(int64_t token);
-/*
-	int sendMessage(long sender_id, long receiver_id, Message message);
 
+	int send_text_Message(const std::string& sender_id, const std::string& receiver_id, const std::string message_content);
+/*
 	std::vector<Message> getMessages(long user_id, int start, int limit);
 */
 };

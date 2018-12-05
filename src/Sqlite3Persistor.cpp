@@ -41,6 +41,7 @@ Sqlite3Persistor::Sqlite3Persistor(){
 
 	statements.push_back(string("create table if not exists users(id integer primary key autoincrement, user_name string, password string)"));
 	statements.push_back(string("create table if not exists tokens(id integer primary key autoincrement, token string)"));
+	statements.push_back(string("create table if not exists text_message(id integer primary key autoincrement, sender_id integer, receiver_id integer, message_content string, date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"));
 
 	for(int i = 0; i < statements.size(); i++)
 	{
@@ -106,4 +107,13 @@ bool Sqlite3Persistor::token_exists(const std::string& token){
 	char * zErrMsg = 0;
 	sqlite3_exec(db, string("select * from tokens where token = '" + token + "'").c_str(), count_rows, 0, &zErrMsg);
 	return last_query_row_count != 0;
+}
+
+std::string message_timestamp = "";
+int Sqlite3Persistor::send_text_Message(const std::string& sender_id, const std::string& receiver_id, const std::string message_content){
+
+	char *zErrMsg = 0;
+	sqlite3_exec(db, string("INSERT INTO text_message(sender_id, receiver_id, message_content) VALUES('" + sender_id + "','" + receiver_id + "','" + message_content +")").c_str(), 0, 0, &zErrMsg);
+	int64_t id = (int64_t) sqlite3_last_insert_rowid(db);
+
 }
